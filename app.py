@@ -3,19 +3,15 @@ import numpy as np
 import tensorflow as tf
 import pandas as pd
 
-# Load the trained model
 model = tf.keras.models.load_model('heart_disease_model.h5')
 
-# Title of the app
 st.title("❤️Heart-Disease Prediction App")
 
 st.markdown("---")
 st.caption("**Built by Aman**")
 
-# User input form
 st.sidebar.header("Enter Patient Information")
 
-# Input fields with relevant ranges
 age = st.sidebar.number_input("Age", min_value=20, max_value=100, value=50)
 sex = st.sidebar.selectbox("Sex", [0, 1], format_func=lambda x: "Male" if x == 1 else "Female")
 cp = st.sidebar.slider("Chest Pain Type (0-3)", 0, 3, 1)
@@ -30,10 +26,8 @@ slope = st.sidebar.slider("Slope of ST (0-2)", 0, 2, 1)
 vessels = st.sidebar.slider("Number of Vessels (0-3)", 0, 3, 0)
 thallium = st.sidebar.slider("Thallium Stress Test (1-3)", 1, 3, 2)
 
-# Collect input features
 user_input = np.array([[age, sex, cp, bp, cholesterol, fbs, ekgr, max_hr, ex_angina, st_depression, slope, vessels, thallium]])
 
-# Prediction
 if st.sidebar.button("Predict Heart Disease"):
     prediction = model.predict(user_input)
     result = prediction[0][0] > 0.5
@@ -46,6 +40,5 @@ if st.sidebar.button("Predict Heart Disease"):
 
     st.info(f"Prediction Probability: {prediction[0][0]:.2f}")
 
-# Footer
 st.markdown("---")
 st.caption("Built with TensorFlow & Streamlit")
