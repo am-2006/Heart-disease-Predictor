@@ -16,7 +16,7 @@ age = st.sidebar.number_input("Age", min_value=20, max_value=100, value=50)
 sex = st.sidebar.selectbox("Sex", [0, 1], 
                            format_func=lambda x: "Male" if x == 1 else "Female")
 
-cp = st.sidebar.slider("Chest Pain Type (0-3)", 0, 3, 1
+cp = st.sidebar.slider("Chest Pain Type (0-3)", 0, 3, 1)
                        
 systolic_bp = st.sidebar.number_input("Systolic Blood Pressure (mm Hg)", 
                                         min_value=80, max_value=250, value=120)
