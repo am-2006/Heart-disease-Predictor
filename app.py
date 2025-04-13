@@ -20,10 +20,8 @@ sex = st.sidebar.selectbox("Sex", [0, 1], format_func=lambda x: "Male" if x == 1
 
 cp = st.sidebar.slider("Chest Pain Type (0-3)", 0, 3, 3)
 
-systolic_bp = st.sidebar.number_input("Systolic Blood Pressure (mm Hg)", min_value=80, max_value=250, value=115)
-diastolic_bp = st.sidebar.number_input("Diastolic Blood Pressure (mm Hg)", min_value=40, max_value=150, value=80)
-
-bp = (systolic_bp + 2 * diastolic_bp) / 3
+# Directly using combined Blood Pressure (bp) input
+bp = st.sidebar.number_input("Blood Pressure (mm Hg)", min_value=80, max_value=250, value=115)
 
 cholesterol = st.sidebar.number_input("Cholesterol (mg/dL)", min_value=100, max_value=600, value=564)
 fbs = st.sidebar.selectbox("Fasting Blood Sugar > 120 mg/dL", [0, 1], index=0)  # Default to 0
@@ -35,7 +33,7 @@ ex_angina = st.sidebar.selectbox("Exercise-Induced Angina", [0, 1], format_func=
 st_depression = st.sidebar.number_input("ST Depression", min_value=0.0, max_value=10.0, value=1.6)
 slope = st.sidebar.slider("Slope of the ST Segment (0-2)", 0, 2, 2)
 vessels = st.sidebar.slider("Number of Major Vessels (0-3)", 0, 3, 0)
-thallium = st.sidebar.slider("Thallium Stress Test Result (1-3)", 1, 3, 7)
+thallium = st.sidebar.slider("Thallium Stress Test Result (1-3)", 1, 3, 2)
 
 # Convert input data into a numpy array for prediction
 user_input = np.array([[age, sex, cp, bp, cholesterol, fbs, ekgr, max_hr, ex_angina, 
@@ -77,9 +75,7 @@ if st.sidebar.button("Predict Heart Disease"):
         - Keep an active routine and balanced diet.
         """)
 
-    # Display prediction probability
     st.info(f"Prediction Probability: {prediction[0][0]:.2f}")
 
-# Footer of the app
 st.markdown("---")
 st.caption("Built with TensorFlow & Streamlit")
