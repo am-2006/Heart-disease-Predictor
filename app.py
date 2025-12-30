@@ -3,6 +3,7 @@ import numpy as np
 import tensorflow as tf
 import joblib
 import os
+import plotly.graph_objects as go
 
 # --- PAGE CONFIG ---
 st.set_page_config(
@@ -23,11 +24,12 @@ st.markdown("""
         font-weight: bold;
         height: 3em;
     }
-    .result-card {
+    .emergency-card {
         padding: 20px;
         border-radius: 12px;
-        border: 1px solid #e0e0e0;
-        background-color: white;
+        background-color: #fff5f5;
+        border: 2px solid #feb2b2;
+        color: #c53030;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -45,10 +47,13 @@ def load_clinical_assets():
 model, scaler = load_clinical_assets()
 
 # --- HEADER ---
-st.title("❤️ HeartCare Ai Assessment")
-st.markdown("AI-Powered Heart Risk Predictor")
+st.title("🫀 Heart Disease Risk Predictor)
+st.markdown("AI-Powered Clinical Risk Screening System")
 st.divider()
 
+if model is None or scaler is None:
+    st.error("🚨 **File Error:** Could not find `heart_disease_model.h5` or `scaler.pkl` in the repository.")
+    st.stop()
 
 # --- INPUT FORM ---
 st.subheader("Patient Medical Profile")
@@ -115,6 +120,18 @@ if st.button("Generate Risk Assessment"):
             <strong>🚨 EMERGENCY STEPS:</strong><br>
             1. <strong>Cardiac Helpline:</strong> Call 102 or 108 (National Medical Emergency).<br>
             2. <strong>Seek Immediate Care:</strong> Chest pain or breathlessness requires urgent attention.
+        </div>
+        """, unsafe_allow_html=True)
+        
+        st.markdown("<br>", unsafe_allow_html=True)
+        st.link_button("🏥 Locate Nearby Cardiac Hospitals", 
+                       "https://www.google.com/maps/search/cardiology+hospital+near+me")
+    else:
+        st.success("### ✅ Low Risk Identified")
+        st.info("Continue maintaining a healthy lifestyle. Regular check-ups are still advised.")
+
+st.divider()
+st.caption("Developed by Aman Kumar Choudhary | Disclaimer: For screening only. Not a medical diagnosis.")            2. <strong>Seek Immediate Care:</strong> Chest pain or breathlessness requires urgent attention.
         </div>
         """, unsafe_allow_html=True)
         
