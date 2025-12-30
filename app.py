@@ -77,32 +77,54 @@ with st.container():
 # --- PREDICTION ---
 st.markdown("<br>", unsafe_allow_html=True)
 if st.button("Generate Risk Assessment"):
-    # CRITICAL: Feature alignment matching CSV order
-    # Order: Age, Sex, CP, Trestbps, Chol, FBS, RestECG, Thalach, Exang, Oldpeak, Slope, CA, Thal
     features = np.array([[age, sex, cp, trestbps, chol, fbs, restecg, thalach, exang, oldpeak, slope, ca, thal]])
-    
-    # 1. Scaling (This transforms raw inputs into z-scores)
     features_scaled = scaler.transform(features)
-    
-    # 2. Prediction
     prediction = model.predict(features_scaled)
     probability = float(prediction[0][0])
     
-    # 3. UI Display
     st.divider()
-    res_col1, res_col2 = st.columns([2, 1])
     
-    with res_col1:
-        if probability > 0.5:
-            st.error(f"### High Risk Identified")
-            st.write("The clinical data correlates strongly with heart disease patterns.")
-        else:
-            st.success(f"### Low Risk Identified")
-            st.write("The clinical data suggests a low statistical risk of heart disease.")
+    # --- REQUIREMENT 2: SUNBURST/CIRCLE GAUGE ---
+    fig = go.Figure(go.Indicator(
+        mode = "gauge+number",
+        value = probability * 100,
+        domain = {'x': [0, 1], 'y': [0, 1]},
+        title = {'text': "Heart Disease Risk %", 'font': {'size': 24}},
+        gauge = {
+            'axis': {'range': [None, 100], 'tickwidth': 1, 'tickcolor': "darkblue"},
+            'bar': {'color': "#e63946" if probability > 0.5 else "#2a9d8f"},
+            'bgcolor': "white",
+            'borderwidth': 2,
+            'bordercolor': "gray",
+            'steps': [
+                {'range': [0, 50], 'color': '#e8f5e9'},
+                {'range': [50, 100], 'color': '#ffebee'}],
+            'threshold': {
+                'line': {'color': "black", 'width': 4},
+                'thickness': 0.75,
+                'value': 90}}))
+    
+    fig.update_layout(height=350, margin=dict(l=20, r=20, t=50, b=20))
+    st.plotly_chart(fig, use_container_width=True)
 
-    with res_col2:
-        st.metric("Risk Score", f"{probability:.2%}")
-        st.progress(probability)
+    # --- REQUIREMENT 1: HIGH RISK ADDITIONS ---
+    if probability > 0.5:
+        st.error("### ⚠️ High Risk Identified")
+        st.markdown(f"""
+        <div class="emergency-card">
+            <strong>🚨 EMERGENCY STEPS:</strong><br>
+            1. <strong>Cardiac Helpline:</strong> Call 102 or 108 (National Medical Emergency).<br>
+            2. <strong>Seek Immediate Care:</strong> Chest pain or breathlessness requires urgent attention.
+        </div>
+        """, unsafe_allow_html=True)
+        
+        st.markdown("<br>", unsafe_allow_html=True)
+        st.link_button("🏥 Locate Nearby Cardiac Hospitals", 
+                       "https://www.google.com/maps/search/cardiology+hospital+near+me")
+    else:
+        st.success("### ✅ Low Risk Identified")
+        st.info("Continue maintaining a healthy lifestyle. Regular check-ups are still advised.")
+
 
     # Guidance
     st.info("**Next Step:** This assessment is for screening purposes. Please consult a qualified medical professional for a final diagnosis.")
