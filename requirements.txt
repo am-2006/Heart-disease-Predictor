@@ -1,5 +1,7 @@
-tensorflow
 pandas
-numpy
 streamlit
+tensorflow
+numpy
+joblib
 scikit-learn
+plotly
