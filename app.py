@@ -45,8 +45,8 @@ def load_clinical_assets():
 model, scaler = load_clinical_assets()
 
 # --- HEADER ---
-st.title("❤️ Heart Disease Assessment")
-st.markdown("AI-Powered Clinical Risk Screening System")
+st.title("❤️ HeartCare Ai Assessment")
+st.markdown("AI-Powered Heart Risk Predictor")
 st.divider()
 
 
