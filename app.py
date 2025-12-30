@@ -104,10 +104,7 @@ if st.button("Generate Risk Assessment"):
             'steps': [
                 {'range': [0, 50], 'color': '#e8f5e9'},
                 {'range': [50, 100], 'color': '#ffebee'}],
-            'threshold': {
-                'line': {'color': "black", 'width': 4},
-                'thickness': 0.75,
-                'value': 90}}))
+            }))
     
     fig.update_layout(height=350, margin=dict(l=20, r=20, t=50, b=20))
     st.plotly_chart(fig, use_container_width=True)
@@ -131,4 +128,4 @@ if st.button("Generate Risk Assessment"):
         st.info("Continue maintaining a healthy lifestyle. Regular check-ups are still advised.")
 
 st.divider()
-st.caption("Developed by Aman Kumar Choudhary | Disclaimer: For screening only. Not a medical diagnosis.")
+st.caption("Developed by A.H.M | Disclaimer: For screening only. Not a medical diagnosis.")
