@@ -47,7 +47,7 @@ def load_clinical_assets():
 model, scaler = load_clinical_assets()
 
 # --- HEADER ---
-st.title("🫀 Heart Disease Risk Predictor")
+st.title("❤️ Heart Disease Risk Predictor")
 st.markdown("AI-Powered Clinical Risk Screening System")
 st.divider()
 
@@ -131,20 +131,4 @@ if st.button("Generate Risk Assessment"):
         st.info("Continue maintaining a healthy lifestyle. Regular check-ups are still advised.")
 
 st.divider()
-st.caption("Developed by Aman Kumar Choudhary | Disclaimer: For screening only. Not a medical diagnosis.")            2. <strong>Seek Immediate Care:</strong> Chest pain or breathlessness requires urgent attention.
-        </div>
-        """, unsafe_allow_html=True)
-        
-        st.markdown("<br>", unsafe_allow_html=True)
-        st.link_button("🏥 Locate Nearby Cardiac Hospitals", 
-                       "https://www.google.com/maps/search/cardiology+hospital+near+me")
-    else:
-        st.success("### ✅ Low Risk Identified")
-        st.info("Continue maintaining a healthy lifestyle. Regular check-ups are still advised.")
-
-
-    # Guidance
-    st.info("**Next Step:** This assessment is for screening purposes. Please consult a qualified medical professional for a final diagnosis.")
-
-st.divider()
-st.caption(" AI Medical Diagnostic System")
+st.caption("Developed by Aman Kumar Choudhary | Disclaimer: For screening only. Not a medical diagnosis.")
