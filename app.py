@@ -1,129 +1,113 @@
 import streamlit as st
 import numpy as np
 import tensorflow as tf
+import joblib
+import os
 
-# --- PHASE 3: BUILDING THE STREAMLIT UI ---
-
-# 1. Configure the Page
+# ---------------- PAGE CONFIG ----------------
 st.set_page_config(
-    page_title="Heart Disease Risk Assessment",
+    page_title="HeartCare AI",
     page_icon="❤️",
-    layout="wide"
+    layout="wide",
 )
 
-# 2. Custom Styling (Injecting CSS for Phase 3 "Clinical Cards")
+# ---------------- CUSTOM CSS ----------------
 st.markdown("""
 <style>
     .main { background-color: #f8f9fa; }
     .card {
         background-color: white;
-        padding: 25px;
-        border-radius: 15px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        border: 1px solid #edf2f7;
         margin-bottom: 20px;
-        border: 1px solid #e9ecef;
     }
-    .status-high { color: #d62828; font-weight: bold; font-size: 1.2rem; }
-    .status-low { color: #2a9d8f; font-weight: bold; font-size: 1.2rem; }
+    .stButton>button {
+        width: 100%;
+        border-radius: 8px;
+        background-color: #e63946;
+        color: white;
+        font-weight: bold;
+        height: 3em;
+    }
 </style>
 """, unsafe_allow_html=True)
 
-# 3. Load the Model (Required for Phase 4)
+# ---------------- ASSET LOADING ----------------
 @st.cache_resource
-def load_trained_model():
-    """Loads the .h5 model file created in Phase 2."""
-    try:
-        return tf.keras.models.load_model("heart_disease_model.h5")
-    except Exception as e:
-        return None
+def load_assets():
+    model_path = "heart_disease_model.h5"
+    scaler_path = "scaler.pkl"
+    
+    # Check if files exist
+    if not os.path.exists(model_path) or not os.path.exists(scaler_path):
+        return None, None
+    
+    # Load Model and Scaler
+    model = tf.keras.models.load_model(model_path)
+    scaler = joblib.load(scaler_path)
+    return model, scaler
 
-model = load_trained_model()
+model, scaler = load_assets()
 
-# 4. Create the Sidebar (Phase 3 Inputs)
-st.sidebar.header("📋 Patient Clinical Inputs")
-st.sidebar.markdown("Enter medical markers below:")
-
-age = st.sidebar.number_input("Age", 20, 100, 55)
-sex = st.sidebar.selectbox("Sex", [1, 0], format_func=lambda x: "Male" if x == 1 else "Female")
-cp = st.sidebar.selectbox("Chest Pain Type", [0, 1, 2, 3], 
-                         format_func=lambda x: ["Typical Angina", "Atypical Angina", "Non-anginal", "Asymptomatic"][x])
-trestbps = st.sidebar.slider("Resting Blood Pressure", 80, 200, 120)
-chol = st.sidebar.slider("Serum Cholesterol", 100, 600, 240)
-fbs = st.sidebar.radio("Fasting Blood Sugar > 120 mg/dl", [1, 0], format_func=lambda x: "Yes" if x == 1 else "No")
-restecg = st.sidebar.selectbox("Resting ECG Results", [0, 1, 2])
-thalach = st.sidebar.number_input("Max Heart Rate Achieved", 60, 220, 150)
-exang = st.sidebar.radio("Exercise Induced Angina", [1, 0], format_func=lambda x: "Yes" if x == 1 else "No")
-oldpeak = st.sidebar.number_input("ST Depression", 0.0, 6.0, 1.0)
-slope = st.sidebar.selectbox("Peak Exercise ST Slope", [0, 1, 2])
-ca = st.sidebar.slider("Number of Major Vessels", 0, 3, 0)
-thal = st.sidebar.selectbox("Thallium Test Result", [1, 2, 3])
-
-# --- PHASE 4: INTEGRATION & PREDICTION LOGIC ---
-
-st.title("Cardiovascular Risk Analysis")
-st.markdown("Use this AI-assisted tool for preliminary patient screening and clinical triage.")
-
-if st.sidebar.button("Run Diagnostic Assessment"):
-    if model is not None:
-        # 1. Array Conversion
-        user_input = np.array([[age, sex, cp, trestbps, chol, fbs, restecg, 
-                               thalach, exang, oldpeak, slope, ca, thal]])
-        
-        # 2. Prediction
-        prediction = model.predict(user_input)
-        probability = float(prediction[0][0])
-        
-        # 3. Thresholding & Results
-        st.divider()
-        col_res1, col_res2 = st.columns([2, 1])
-        
-        with col_res1:
-            if probability > 0.5:
-                st.error(f"### Assessment: HIGH RISK ({probability:.1%})")
-                st.write("Clinical indicators show high correlation with heart disease patterns.")
-            else:
-                st.success(f"### Assessment: LOW RISK ({probability:.1%})")
-                st.write("Clinical markers suggest a lower probability of heart disease.")
-        
-        with col_res2:
-            st.metric("Risk Probability", f"{probability:.1%}")
-            st.progress(probability)
-
-        # --- PHASE 5: ADDING CLINICAL CONTEXT ---
-
-        st.subheader("📋 Clinical Guidance")
-        
-        # 1. Dynamic Content
-        if probability > 0.5:
-            st.markdown(f"""
-            <div class='card'>
-                <p class='status-high'>⚠️ Urgent Recommendations:</p>
-                <ul>
-                    <li>Immediate referral to a cardiologist for diagnostic correlation.</li>
-                    <li>Evaluate for <strong>Stress ECG</strong> or <strong>Echocardiogram</strong>.</li>
-                    <li>Strict monitoring of lipid profile and blood pressure.</li>
-                </ul>
-            </div>
-            """, unsafe_allow_html=True)
-        else:
-            st.markdown(f"""
-            <div class='card'>
-                <p class='status-low'>✅ Preventive Recommendations:</p>
-                <ul>
-                    <li>Maintain 150 minutes of moderate aerobic activity weekly.</li>
-                    <li>Continue heart-healthy diet (Mediterranean/DASH).</li>
-                    <li>Schedule annual cardiovascular wellness screenings.</li>
-                </ul>
-            </div>
-            """, unsafe_allow_html=True)
-
-        # 2. External Links
-        st.link_button("🏥 Find Nearby Cardiac Care Centers", 
-                       "https://www.google.com/maps/search/cardiology+hospital+near+me")
-
-else:
-    st.info("👈 Enter patient clinical markers in the sidebar and click 'Run Diagnostic Assessment'.")
-
-# Footer Disclaimer
+# ---------------- HEADER ----------------
+st.title("❤️ HeartCare Risk Assessment")
+st.markdown("AI-powered clinical screening system")
 st.divider()
-st.caption("Disclaimer: This tool is for educational/screening purposes and does not replace professional medical diagnosis.")
+
+
+
+# ---------------- SIDEBAR INPUTS ----------------
+st.sidebar.header("📋 Patient Information")
+
+age = st.sidebar.number_input("Age", 1, 120, 55)
+sex = st.sidebar.selectbox("Sex", [1, 0], format_func=lambda x: "Male" if x == 1 else "Female")
+cp = st.sidebar.selectbox("Chest Pain Type (0-3)", [0, 1, 2, 3])
+trestbps = st.sidebar.number_input("Resting Blood Pressure (mm Hg)", 80, 200, 120)
+chol = st.sidebar.number_input("Cholesterol (mg/dl)", 100, 600, 200)
+fbs = st.sidebar.selectbox("Fasting Blood Sugar > 120 mg/dl", [1, 0], format_func=lambda x: "Yes" if x == 1 else "No")
+restecg = st.sidebar.selectbox("Resting ECG Result (0-2)", [0, 1, 2])
+thalach = st.sidebar.number_input("Max Heart Rate Achieved", 60, 220, 150)
+exang = st.sidebar.selectbox("Exercise Induced Angina", [1, 0], format_func=lambda x: "Yes" if x == 1 else "No")
+oldpeak = st.sidebar.number_input("ST Depression (Oldpeak)", 0.0, 10.0, 1.0)
+slope = st.sidebar.selectbox("ST Slope (0-2)", [0, 1, 2])
+ca = st.sidebar.selectbox("Major Vessels (0-3)", [0, 1, 2, 3])
+thal = st.sidebar.selectbox("Thallium Test Result (1-3)", [1, 2, 3])
+
+# ---------------- PREDICTION ----------------
+if st.sidebar.button("Analyze Risk"):
+    # 1. Arrange data in the exact order the model expects
+    input_data = np.array([[age, sex, cp, trestbps, chol, fbs, restecg, 
+                            thalach, exang, oldpeak, slope, ca, thal]])
+    
+    # 2. SCALE THE DATA (Crucial fix for "All High Risk" bug)
+    input_data_scaled = scaler.transform(input_data)
+    
+    # 3. Get Prediction
+    prediction = model.predict(input_data_scaled)
+    probability = float(prediction[0][0])
+    
+    # 4. Results UI
+    st.subheader("Assessment Result")
+    col1, col2 = st.columns([2, 1])
+    
+    with col1:
+        if probability > 0.5:
+            st.error(f"### High Risk Identified")
+            st.write("The clinical profile indicates a high statistical probability of heart disease presence.")
+        else:
+            st.success(f"### Low Risk Identified")
+            st.write("The clinical profile indicates a low statistical probability of heart disease presence.")
+    
+    with col2:
+        st.metric("Probability", f"{probability:.2%}")
+        st.progress(probability)
+
+    # Guidance Card
+    st.markdown("""<div class='card'><h4>Recommendation</h4>""" + 
+        ("Consult a cardiologist for a thorough examination." if probability > 0.5 else "Maintain a heart-healthy lifestyle and regular screenings.") + 
+        """</div>""", unsafe_allow_html=True)
+
+st.divider()
+st.caption("Disclaimer: This is a screening tool, not a medical diagnosis. Consult a doctor for medical advice.")
