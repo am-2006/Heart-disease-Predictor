@@ -5,14 +5,12 @@ import joblib
 import os
 import plotly.graph_objects as go
 
-# --- PAGE CONFIG ---
 st.set_page_config(
     page_title="Heart Disease Risk Assessment",
     page_icon="❤️",
     layout="centered",
 )
 
-# --- STYLING ---
 st.markdown("""
 <style>
     .main { background-color: #f8f9fa; }
@@ -34,7 +32,6 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# --- LOAD ASSETS ---
 @st.cache_resource
 def load_clinical_assets():
     try:
@@ -46,7 +43,6 @@ def load_clinical_assets():
 
 model, scaler = load_clinical_assets()
 
-# --- HEADER ---
 st.title("❤️ Heart Disease Risk Predictor")
 st.markdown("AI-Powered Clinical Risk Screening System")
 st.divider()
@@ -55,7 +51,6 @@ if model is None or scaler is None:
     st.error("🚨 **File Error:** Could not find `heart_disease_model.h5` or `scaler.pkl` in the repository.")
     st.stop()
 
-# --- INPUT FORM ---
 st.subheader("Patient Medical Profile")
 with st.container():
     col1, col2 = st.columns(2)
@@ -79,7 +74,6 @@ with st.container():
         thal = st.selectbox("Thallium Test", [3, 6, 7], 
                            format_func=lambda x: {3:"Normal", 6:"Fixed Defect", 7:"Reversible Defect"}[x])
 
-# --- PREDICTION ---
 st.markdown("<br>", unsafe_allow_html=True)
 if st.button("Generate Risk Assessment"):
     features = np.array([[age, sex, cp, trestbps, chol, fbs, restecg, thalach, exang, oldpeak, slope, ca, thal]])
@@ -89,7 +83,6 @@ if st.button("Generate Risk Assessment"):
     
     st.divider()
     
-    # --- REQUIREMENT 2: SUNBURST/CIRCLE GAUGE ---
     fig = go.Figure(go.Indicator(
         mode = "gauge+number",
         value = probability * 100,
@@ -109,7 +102,7 @@ if st.button("Generate Risk Assessment"):
     fig.update_layout(height=350, margin=dict(l=20, r=20, t=50, b=20))
     st.plotly_chart(fig, use_container_width=True)
 
-    # --- REQUIREMENT 1: HIGH RISK ADDITIONS ---
+
     if probability > 0.5:
         st.error("### ⚠️ High Risk Identified")
         st.markdown(f"""
